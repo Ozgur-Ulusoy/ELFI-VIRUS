@@ -1,7 +1,8 @@
 package com.isee.elfi;
 
-import org.bytedeco.javacv.*;
+
 import org.bytedeco.ffmpeg.global.avcodec;
+import org.bytedeco.javacv.*;
 
 public class CameraCapture {
 
@@ -19,7 +20,7 @@ public class CameraCapture {
             System.out.println("Kamera başlatıldı.");
 
             // Kaydedilecek video dosyasını belirleyin
-            recorder = new FFmpegFrameRecorder("C:\\Users\\Mert\\Documents\\GitHub\\ELFI-VIRUS\\video.mp4", 640, 480);
+            recorder = new FFmpegFrameRecorder(System.getProperty("user.dir")+"/resources/"+"video.flv", 640, 480);
             recorder.setVideoCodec(avcodec.AV_CODEC_ID_FLV1); // FLV codec (Flash Video)
             recorder.setFormat("flv"); // FLV formatı
             // Format ayarı

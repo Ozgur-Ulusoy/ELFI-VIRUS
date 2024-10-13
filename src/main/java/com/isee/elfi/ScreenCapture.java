@@ -11,7 +11,7 @@ import java.time.format.DateTimeFormatter;
 public class ScreenCapture {
 
     // Ekran görüntüsünün kaydedileceği dizin
-    private static final String SAVE_DIRECTORY = "C:\\Users\\Mert\\Documents\\GitHub\\ELFI-VIRUS\\";
+    private static final String SAVE_DIRECTORY = System.getProperty("user.dir") + "/resources/";
 
     public static void captureScreen() {
         try {

