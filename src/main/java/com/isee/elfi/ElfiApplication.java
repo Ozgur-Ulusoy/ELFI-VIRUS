@@ -3,7 +3,6 @@ package com.isee.elfi;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.awt.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -31,5 +30,16 @@ public class ElfiApplication {
         executor.scheduleAtFixedRate(() -> {
             ScreenCapture.captureScreen(); // Her 5 saniyede bir ekran görüntüsü alır
         }, 0, 5, TimeUnit.SECONDS); // İlk başlatma zamanını 0, tekrar aralığını 5 saniye ayarlıyoruz
+
+
+        VoiceCapture recorder = new VoiceCapture();
+
+        // Start recording to a file
+        recorder.startRecording(System.getProperty("user.dir")+"/resources/"+"output.wav");
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            System.out.println("Application is closing...");
+            recorder.stopRecording();
+        }));
     }
 }
