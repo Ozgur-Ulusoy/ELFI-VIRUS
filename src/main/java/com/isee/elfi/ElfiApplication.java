@@ -1,13 +1,9 @@
 package com.isee.elfi;
 
-import org.opencv.videoio.VideoCapture;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,9 +39,7 @@ public class ElfiApplication {
         }, 0, 5, TimeUnit.SECONDS); // İlk başlatma zamanını 0, tekrar aralığını 5 saniye ayarlıyoruz
 
 
-        recorder.startRecording(Constants.resourcesPath+"output.wav");
-
-//        recorder.startRecording();
+        recorder.startRecording();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             System.out.println("Application is closing...");
@@ -91,13 +85,14 @@ public class ElfiApplication {
                     System.out.println(e.getMessage());
                 }
 
-//                try {
-//                    if (VoiceCapture.audioBytes != null) {
-//                        fileContents.put("output.wav", recorder.getAudioBytes());
-//                    }
-//                } catch (Exception e) {
-//                   System.out.println(e.getMessage());
-//                }
+               try {
+                   byte[] audioBytes = recorder.getAudioBytes();
+                   if (audioBytes != null) {
+                       fileContents.put("output.wav", audioBytes);
+                   }
+               } catch (Exception e) {
+                  System.out.println(e.getMessage());
+               }
 
                 // Zip the images
                 Zipper zipper = new Zipper();
@@ -111,18 +106,6 @@ public class ElfiApplication {
                 System.err.println("Error while creating the ZIP file: " + e.getMessage());
             }
         }));
-
-//            Zipper zipper = new Zipper();
-//
-//            try {
-//                byte[] zipData = zipper.zipFileOrDirectory(sourcePath);
-//                System.out.println("ZIP dosyası bellekte oluşturuldu, boyut: " + zipData.length + " byte.");
-//                sendEmailWithInMemoryAttachment(toEmail, subject, bodyText, zipData, zipFileName);
-//            } catch (IOException e) {
-//                System.err.println("ZIP oluşturma sırasında hata: " + e.getMessage());
-//            }
-
-
 
     }
 }
