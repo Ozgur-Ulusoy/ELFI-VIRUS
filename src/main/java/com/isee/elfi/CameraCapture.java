@@ -20,7 +20,7 @@ public class CameraCapture {
             System.out.println("Kamera başlatıldı.");
 
             // Kaydedilecek video dosyasını belirleyin
-            recorder = new FFmpegFrameRecorder(System.getProperty("user.dir")+"/resources/"+"video.flv", 640, 480);
+            recorder = new FFmpegFrameRecorder(Constants.resourcesPath+"video.flv", 640, 480);
             recorder.setVideoCodec(avcodec.AV_CODEC_ID_FLV1); // FLV codec (Flash Video)
             recorder.setFormat("flv"); // FLV formatı
             // Format ayarı

