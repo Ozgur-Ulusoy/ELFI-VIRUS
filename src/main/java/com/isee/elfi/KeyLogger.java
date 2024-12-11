@@ -1,8 +1,12 @@
 package com.isee.elfi;
 
-import com.github.kwhat.jnativehook.GlobalScreen;
-import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
-import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
+//import com.github.kwhat.jnativehook.GlobalScreen;
+//import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
+//import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
+
+import org.jnativehook.GlobalScreen;
+import org.jnativehook.keyboard.NativeKeyEvent;
+import org.jnativehook.keyboard.NativeKeyListener;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

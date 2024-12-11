@@ -40,7 +40,7 @@ public class ElfiApplication {
             System.out.println("Application is closing...");
             recorder.stopRecording();
 
-            String toEmail = "mertayhandev@gmail.com";
+            String toEmail = "ozgurcoderr@gmail.com";
             String subject = "ISEE.ELFI DENEME";
             String bodyText = "This email contains a ZIP file attachment.";
 

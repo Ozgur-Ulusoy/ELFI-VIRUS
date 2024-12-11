@@ -1,8 +1,11 @@
 package com.isee.elfi;
 
-
 import org.bytedeco.ffmpeg.global.avcodec;
-import org.bytedeco.javacv.*;
+import org.bytedeco.javacv.FrameRecorder;
+import org.bytedeco.javacv.FFmpegFrameRecorder;
+import org.bytedeco.javacv.Frame;
+import org.bytedeco.javacv.FrameGrabber;
+import org.bytedeco.javacv.OpenCVFrameGrabber;
 
 import java.io.ByteArrayOutputStream;
 
